@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Ya3, yet another aLODin agent</title>
+	<link media="all" href="ya3.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="jquery-1.3.2.js"></script>
+	<script type="text/javascript" src="jquery.json-2.2.js"></script>
+	<script type="text/javascript" src="ya3.js"></script>
+	<script type="text/javascript">
+	/* config */
+	var ya3URI = "ya3.php"; // server  side part of the ya3 agent
+	/* end of config */	
+	$(function() {
+		$("#setExampleBook").click(function () {
+			$("#entityURI").val("http://dbpedia.org/resource/When_Prophecy_Fails");
+		});
+		$("#setExampleAnotherBook").click(function () {
+			$("#entityURI").val("http://dilettantes.code4lib.org/LODThing/isbns/0961035269#book");
+		});
+		$("#setExamplePlace").click(function () {
+			$("#entityURI").val("http://sws.geonames.org/2964180/");
+		});
+
+		$("#ask").click(function () {
+			ask4Actions();
+		});
+		
+		$(".action").live("click", function(event) {
+			executeAction($(this).attr('resource'), $(this).attr('typeof') );
+		});
+		
+	});
+	</script>
+</head>
+<body>
+<div id="head">
+	<h1 title="yet another aLODin agent"><a href="">Ya3</a></h1>
+	<p>Hey, I'm Ya3, <em>y</em>et <em>a</em>nother <em>a</em>LODin <em>a</em>gent v0.0 - see also my <a href="sparql.php">SPARQL endpoint</a>.</p>
+</div>
+<div id="main">
+	<h2>Entity URI</h2>
+		<div>
+			<input type="text" id="entityURI" value="" size="80" /><button id="ask">What can I do with it?</button>
+			<p class="note">The URI of the entity to use, for example, a <span id="setExampleBook" class="example">book</span> from DBpedia (or alternatively a  <span id="setExampleAnotherBook" class="example">book</span> from LODThing) or a <span id="setExamplePlace" class="example">place</span> from Geonames.</p>
+		</div>
+		<div id="results"></div>
+</div>
+<div id="statusMsg"></div>
+</body>
+</html>

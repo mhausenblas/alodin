@@ -1,0 +1,54 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix ea: <http://purl.org/NET/entity-actions#> .
+@prefix : <#> .
+
+# the entire action set, serving as a container for the entity-action assignments
+:all	a ea:EntityActionSet ;
+		dcterms:title "An example action set for aLODin agents" ; 
+		dcterms:created "2010-05-01" ;
+		dcterms:creator <http://sw-app.org/mic.xhtml#i> .
+	
+# the entity 'book' and its associated actions		
+:book	a ea:Entity ;
+		ea:in :all ;
+		ea:match [
+			ea:concept <http://dbpedia.org/ontology/Book> ;
+			ea:action :buy-book ;
+			ea:attribute <http://dbpedia.org/ontology/isbn> ;
+		] ;
+		ea:match [
+			ea:concept <http://dbpedia.org/ontology/Book> ;
+			ea:action :review ;
+			ea:attribute <http://www.w3.org/2000/01/rdf-schema#label> ;
+		] ;
+		ea:match [
+			ea:concept <http://purl.org/ontology/bibo/Book> ;
+			ea:action :buy-book ;
+			ea:attribute <http://purl.org/ontology/bibo/isbn10> ;
+		] .
+
+# the entity 'place' and its associated actions
+:place	a ea:Entity ;
+		ea:in :all ;
+		ea:match [
+			ea:concept <http://www.geonames.org/ontology#Feature> ;
+			ea:action :map ;
+			ea:attribute <http://www.geonames.org/ontology#name> ;
+		] .
+
+# the 'buy the book' action using a simple HTTP interface call
+:buy-book	a ea:Action ;
+			dcterms:title "buy the book" ; 
+			ea:using <http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=> .
+
+# the 'review something' action using a simple HTTP interface call
+:review	a ea:Action ;
+		dcterms:title "review it" ; 
+		ea:using <http://revyu.com/search/?query=> .
+		
+# the 'map a place' action using a simple HTTP interface call
+:map	a ea:Action ;
+		dcterms:title "map it" ; 
+		ea:using <http://maps.google.com/maps/api/staticmap?zoom=11&size=400x400&sensor=false&center=> .
