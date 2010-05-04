@@ -22,11 +22,22 @@
 		});
 
 		$("#ask").click(function () {
+			setBusy();
 			ask4Actions();
 		});
 		
 		$(".action").live("click", function(event) {
+			setBusy();
 			executeAction($(this).attr('resource'), $(this).attr('typeof') );
+			ask4Actions();
+		});
+		
+		$(".action").live("mouseover", function(event) {
+			$(this).css("color", "black");
+		});
+		
+		$(".action").live("mouseout", function(event) {
+			$(this).css("color", "#6f6f6f");
 		});
 		
 	});

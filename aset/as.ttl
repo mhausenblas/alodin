@@ -1,6 +1,7 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix ea: <http://purl.org/NET/entity-actions#> .
 @prefix : <#> .
 
@@ -40,15 +41,18 @@
 
 # the 'buy the book' action using a simple HTTP interface call
 :buy-book	a ea:Action ;
-			dcterms:title "buy the book" ; 
+			dcterms:title "buy the book" ;
+			foaf:depiction <../aset/action-symbols/amazon.png> ;
 			ea:using <http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=> .
 
 # the 'review something' action using a simple HTTP interface call
 :review	a ea:Action ;
 		dcterms:title "review it" ; 
+		dcterms:description "via revyu.com" ;
 		ea:using <http://revyu.com/search/?query=> .
 		
 # the 'map a place' action using a simple HTTP interface call
 :map	a ea:Action ;
 		dcterms:title "map it" ; 
+		foaf:depiction <../aset/action-symbols/google-maps.png> ;
 		ea:using <http://maps.google.com/maps/api/staticmap?zoom=11&size=400x400&sensor=false&center=> .

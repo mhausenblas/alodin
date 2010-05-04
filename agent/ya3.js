@@ -20,7 +20,6 @@ function ask4Actions(){
 function executeAction(actionURI, entityConceptURI){
 	var entityURI = $("#entityURI").val();
 	
-	
 	$.ajax({
 		type: "GET",
 		url: ya3URI,
@@ -42,6 +41,11 @@ function executeAction(actionURI, entityConceptURI){
 
 
 // other stuff
+
+function setBusy(){
+	$("#results").html("<img src='img/ajax-loader.gif' id='busy' width='32px' alt='busy />");	
+}
+
 function setStatus(status){
 	$("#statusMsg").text(status);
 	$("#statusMsg").fadeIn(1000);

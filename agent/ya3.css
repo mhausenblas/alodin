@@ -73,16 +73,39 @@ label.required {
 	color: #3c3c9c;	
 }
 
-.action {
-	cursor: pointer;
-	background: #CCF;
+.actioncontainer {
+	float: left;
+}
+
+.actiondisplay {
+	text-align: center;
+	width: 120px;
+	background: #FFF;
 	border: 1px solid black;	
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
 	padding: 5px;
 	padding-left: 10px;
 	padding-right: 10px;	
 	margin: 10px;
+	margin-bottom: 0px;
+}
+
+.action {
+	color: #6f6f6f;
+	font-weight: bold;
+	text-align: center;
+	width: 120px;
+	cursor: pointer;
+	background: #CCF;
+	border: 1px solid black;	
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 5px;
+	padding-left: 10px;
+	padding-right: 10px;	
+	margin: 10px;
+	margin-top: 0px;	
 }
 
 .note {
@@ -156,10 +179,11 @@ label.required {
 
 
 #statusMsg {
+	clear: left;
 	font-size: 80%;
 	color: #06F;
 	text-align: left;
-	padding: 2px;
+	padding: 20px;
 	display: none;
 }
 
@@ -183,8 +207,6 @@ label.required {
 #main {
 	margin-top: 1px;
 	padding: 20px; 
-	border: 1px solid #e0e0e0;
-	background: #ffffff;
 }
 
 #footer {

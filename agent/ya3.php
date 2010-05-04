@@ -3,11 +3,10 @@ include_once("../../arc/ARC2.php");
 
 $DEBUG = false;
 
-$defaultprefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX ea: <http://purl.org/NET/entity-actions#> ";
+$defaultprefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX ea: <http://purl.org/NET/entity-actions#> ";
 
 $defaultEntityActionSetURI = "http://localhost:8888/alodin/aset";
 $defaultEntityActionSetDocURI = "http://localhost:8888/alodin/aset/as.ttl";
-
 
 /* ARC2 RDF store config - START */
 $config = array(
@@ -55,9 +54,9 @@ function ask4Actions($entityURI){
 	$entityConceptList = array();
 
 	if(!isDataLocal($entityURI)) { // we haven't tried to dereference the entity URI yet
-		$entityDocURI = isDereferenceableURI($entityURI);	
+		$entityDocURI = isDereferenceableURI($entityURI);
 		if(!$entityDocURI) {
-			return "Unable to dereference the URI <a href='$entityURI'>$entityURI</a>.";
+			return "Unable to retrieve RDF/XML from URI <a href='$entityURI'>$entityURI</a>.";
 		}
 		else {
 			loadEntity($entityURI, $entityDocURI); 
@@ -100,7 +99,7 @@ function lookupActions4EntityWithConcept($entityConcept){
 
 	$cmd = $defaultprefixes;
 	$cmd .= "SELECT *  FROM <" . $defaultEntityActionSetURI . "> WHERE "; 
-	$cmd .= "{ ?entity a ea:Entity ;  ea:match ?match . ?match ea:concept <$entityConcept> ; ea:action ?action .  ?action dcterms:title ?title . }";
+	$cmd .= "{ ?entity a ea:Entity ;  ea:match ?match . ?match ea:concept <$entityConcept> ; ea:action ?action .  ?action dcterms:title ?title . OPTIONAL { ?action dcterms:description ?description } . OPTIONAL { ?action foaf:depiction ?symbol } }";
 	
 	if($DEBUG) echo htmlentities($cmd) . "<br />";
 	
@@ -108,7 +107,24 @@ function lookupActions4EntityWithConcept($entityConcept){
 	
 	if($results['result']['rows']) {
 		foreach ($results['result']['rows'] as $row) {
-			$retval .= "<span class='action' resource='" . $row['action'] . "' typeof='" . $entityConcept . "'>" . $row['title']. "</span>";
+			$display = "";
+			$description = "";
+			
+			if($row['description']) { 
+				$description = $row['description']; 
+			}
+			else  {
+				$description = "no detailed description of the action available, sorry ...";
+			}
+			
+			if($row['symbol']) { 
+				$display = "<img src='" . $row['symbol'] . "' alt='$description' title='$description' />"; }
+			else {
+				$display = "<img src='../aset/action-symbols/default-action.png' alt='$description' title='$description' />";
+			}
+
+			
+			$retval .= "<div class='actioncontainer'><div class='actiondisplay'>$display</div><div class='action' resource='" . $row['action'] . "' typeof='" . $entityConcept . "'>" . $row['title']. "</div></div>";
 		}
 	}
 	
