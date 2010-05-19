@@ -13,6 +13,7 @@
 	
 # the entity 'book' and its associated actions		
 :book	a ea:Entity ;
+		dcterms:title "a book" ;
 		ea:in :all ;
 		ea:match [
 			ea:concept <http://dbpedia.org/ontology/Book> ;
@@ -32,12 +33,25 @@
 
 # the entity 'place' and its associated actions
 :place	a ea:Entity ;
+		dcterms:title "a place" ;
 		ea:in :all ;
 		ea:match [
 			ea:concept <http://www.geonames.org/ontology#Feature> ;
 			ea:action :map ;
 			ea:attribute <http://www.geonames.org/ontology#name> ;
 		] .
+
+# the entity 'person' and its associated actions
+:person	a ea:Entity ;
+		dcterms:title "a person" ;
+		ea:in :all ;
+		ea:match [
+			ea:concept <http://xmlns.com/foaf/0.1/Person> ;
+			ea:action :show-friends ;
+			ea:attribute <http://xmlns.com/foaf/0.1/knows> ;
+		] .
+
+
 
 # the 'buy the book' action using a simple HTTP interface call
 :buy-book	a ea:Action ;
@@ -56,3 +70,10 @@
 		dcterms:title "map it" ; 
 		foaf:depiction <../aset/action-symbols/google-maps.png> ;
 		ea:using <http://maps.google.com/maps/api/staticmap?zoom=11&size=400x400&sensor=false&center=> .
+
+# the 'show friends' action using a simple HTTP interface call
+:show-friends a ea:Action ;
+		dcterms:title "show friends" ; 
+		ea:using <http://sig.ma/search?raw=1&singlesource=> .
+		
+		

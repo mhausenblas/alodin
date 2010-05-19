@@ -26,6 +26,15 @@
 			ask4Actions();
 		});
 		
+		$("#actions").click(function () {
+			listActions();
+			$("#info-container").slideDown("normal");
+		});
+		
+		$("#close-actions").click(function () {
+			$("#info-container").slideUp("normal");
+		});
+		
 		$(".action").live("click", function(event) {
 			setBusy();
 			executeAction($(this).attr('resource'), $(this).attr('typeof') );
@@ -48,6 +57,8 @@
 	<h1 title="yet another aLODin agent"><a href="">Ya3</a></h1>
 	<p>Hey, I'm Ya3, <em>y</em>et <em>a</em>nother <em>a</em>LODin <em>a</em>gent v0.0 - see also my <a href="sparql.php">SPARQL endpoint</a>.</p>
 </div>
+<div id="menu"><span id="actions" class="menuitem">Actions</span> <span id="about" class="menuitem">About</span></div>
+<div id="info-container"><div style="text-align: right"><span id="close-actions" class="menuitem">Close</span></div><div id="info"></div></div>
 <div id="main">
 	<h2>Entity URI</h2>
 		<div>

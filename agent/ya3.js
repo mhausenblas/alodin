@@ -20,6 +20,9 @@ function ask4Actions(){
 function executeAction(actionURI, entityConceptURI){
 	var entityURI = $("#entityURI").val();
 	
+	
+	// check against getAttributeValueCount() first!!!
+	
 	$.ajax({
 		type: "GET",
 		url: ya3URI,
@@ -38,6 +41,24 @@ function executeAction(actionURI, entityConceptURI){
 	});
 	
 }
+
+function listActions(){
+	
+	$.ajax({
+		type: "GET",
+		url: ya3URI,
+		data: "list",
+		success: function(data){
+			$("#info").html(data);
+			setStatus("Listed  all available entities and actions known to me.");
+		},
+		error:  function(msg){
+			setStatus("Error retrieving list: " + msg.status + " " + msg.statusText);
+		} 
+	});
+	
+}
+
 
 
 // other stuff

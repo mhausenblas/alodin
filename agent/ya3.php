@@ -37,6 +37,13 @@ if(isset($_GET['entity'])) {
 	echo ask4Actions($entityURI);
 }
 
+if(isset($_GET['check'])) { 
+	$entityURI = $_GET['check'];
+	$attributeURI = $_GET['attribute'];
+	echo getAttributeValueCount($entityURI, $attributeURI);
+}
+
+
 if(isset($_GET['action'])) { 
 	$actionURI = $_GET['action'];
 	$entityURI = $_GET['onEntity'];
@@ -44,6 +51,12 @@ if(isset($_GET['action'])) {
 	
 	echo executeAction($actionURI, $entityURI, $entityConceptURI);
 }
+
+if(isset($_GET['list'])) { 
+	echo listEntityActions();
+}
+
+
 
 // Ya3 fucntions
 function ask4Actions($entityURI){
@@ -77,13 +90,20 @@ function ask4Actions($entityURI){
 		}
 	}
 	
-	return ask4ActionsOnEntities($entityConceptList);
+	// check if there are actions known for the entity's concepts
+	$retval .= ask4ActionsOnEntities($entityURI, $entityConceptList);
+	
+	return $retval;
 }
 
-function ask4ActionsOnEntities($entityConceptList){
+function ask4ActionsOnEntities($entityURI, $entityConceptList){
 	global $DEBUG;
 
 	$retval = "<p>The following actions are available for the entity:</p><div>";
+	
+	// the view action, always available
+	$retval = "<div class='actioncontainer'><div class='actiondisplay'><img src='../aset/action-symbols/view-action.png' alt='view' title='view' /></div><div class='action' resource='view' typeof='none'>view</div></div>";
+	
 	foreach($entityConceptList as $entityConcept) {
 		$retval .=  " " . lookupActions4EntityWithConcept($entityConcept);
 	}
@@ -103,7 +123,7 @@ function lookupActions4EntityWithConcept($entityConcept){
 	
 	if($DEBUG) echo htmlentities($cmd) . "<br />";
 	
-	$results = $store->query($cmd);
+	$results = $store->query($cmd);	
 	
 	if($results['result']['rows']) {
 		foreach ($results['result']['rows'] as $row) {
@@ -137,21 +157,46 @@ function executeAction($actionURI, $entityURI, $entityConceptURI) {
 	global $defaultEntityActionSetURI;
 	global $DEBUG;
 
+
+	if($actionURI === "view"){
+		return "http://sig.ma/search?singlesource=" . $entityURI . "&raw=1";
+	}
+	else {
+		$cmd = $defaultprefixes;
+		$cmd .= "SELECT *  FROM <" . $defaultEntityActionSetURI . "> WHERE "; 
+		$cmd .= "{ <$actionURI> ea:using ?serviceURI . ?entity ea:match ?match . ?match ea:concept <$entityConceptURI> ; ea:action <$actionURI> ;  ea:attribute ?prop . }";
+
+		if($DEBUG) echo htmlentities($cmd) . "<br />";
+
+		$results = $store->query($cmd);
+
+		if($results['result']['rows']) {
+			foreach ($results['result']['rows'] as $row) {
+				$serviceURI = $row['serviceURI'] . getAttributeValue($entityURI, $row['prop']);
+				return $serviceURI;
+			}
+		}
+	}
+
+}
+
+function getAttributeValueCount($entityURI, $attributeURI){
+	global $store;
+	global $defaultprefixes;
+	global $DEBUG;
+
 	$cmd = $defaultprefixes;
-	$cmd .= "SELECT *  FROM <" . $defaultEntityActionSetURI . "> WHERE "; 
-	$cmd .= "{ <$actionURI> ea:using ?serviceURI . ?entity ea:match ?match . ?match ea:concept <$entityConceptURI> ; ea:action <$actionURI> ;  ea:attribute ?prop . }";
+	$cmd .= "SELECT *  FROM <" . $entityURI . "> WHERE "; 
+	$cmd .= "{ <$entityURI> <$attributeURI> ?val . }";
 	
 	if($DEBUG) echo htmlentities($cmd) . "<br />";
 	
 	$results = $store->query($cmd);
 	
-	if($results['result']['rows']) {
-		foreach ($results['result']['rows'] as $row) {
-			$serviceURI = $row['serviceURI'] . getAttributeValue($entityURI, $row['prop']);
-			return $serviceURI;
-		}
-	}	
+	return count($results['result']['rows']);
+	
 }
+
 
 function getAttributeValue($entityURI, $attributeURI){
 	global $store;
@@ -171,6 +216,76 @@ function getAttributeValue($entityURI, $attributeURI){
 			 return $row['val'];  
 		}
 	}
+}
+
+function listEntityActions() {
+	global $store;
+	global $defaultprefixes;
+	global $defaultEntityActionSetURI;
+	global $DEBUG;
+	
+	$entityList = array();
+	$processedActionList = array();
+	
+
+	$cmd = $defaultprefixes;
+	$cmd .= "SELECT DISTINCT *  FROM <" . $defaultEntityActionSetURI . "> WHERE "; 
+	$cmd .= "{ ?entity a ea:Entity ; dcterms:title ?title  . }";
+	
+	if($DEBUG) echo htmlentities($cmd) . "<br />";
+	
+	$results = $store->query($cmd);
+	
+	if($results['result']['rows']) {
+		foreach ($results['result']['rows'] as $row) {
+			$entityList[$row['entity']] = $row['title'];
+		}
+	}
+
+	//var_dump($entityList);
+	asort($entityList);
+	
+	foreach($entityList as $entityURI => $entityLabel ) {
+		$retval .= "<div>For <a href='" . $entityURI ."'>" . $entityLabel . "</a> the following actions are available:"; 
+
+		$cmd = $defaultprefixes;
+		$cmd .= "SELECT DISTINCT *  FROM <" . $defaultEntityActionSetURI . "> WHERE "; 
+		$cmd .= "{ <$entityURI> a ea:Entity ; ea:match ?match . ?match ea:concept ?entityConcept ; ea:action ?action .  ?action dcterms:title ?atitle . OPTIONAL { ?action dcterms:description ?description } . } ORDER BY ?atitle";
+
+		if($DEBUG) echo htmlentities($cmd) . "<br />";
+
+		$results = $store->query($cmd);
+
+		if($results['result']['rows']) {
+			$retval .= "<ul>";
+			foreach ($results['result']['rows'] as $row) {
+				$description = "";
+				if($row['description']) { 
+					$description = $row['description']; 
+				}
+				else  {
+					$description = "-";
+				}
+				if(in_array($row['action'], $processedActionList)) { // we've already processed this action
+					
+				}
+				else { // first time to see this action; let's remember it
+					$retval .= "<li> <a href='" . $row['action'] ."'>" . $row['atitle'] . "</a> (for type " . $row['entityConcept'] .")</li>"; 	
+					array_push($processedActionList, $row['action'] );
+				}
+				
+			}
+			$retval .= "</ul>";
+		}
+		
+		$retval .= "</div>"; 
+	}
+	
+	
+
+	
+	
+	return $retval;	
 }
 
 // Web data management functions
